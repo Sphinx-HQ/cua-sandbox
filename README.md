@@ -23,10 +23,19 @@ python cli.py --computer local-playwright
 
 Other included sample [computer environments](#computer-environments):
 
-- [Docker](https://docker.com/) (containerized desktop)
-- [Browserbase](https://www.browserbase.com/) (remote browser, requires account)
-- [Scrapybara](https://scrapybara.com) (remote browser or computer, requires account)
-- ...or implement your own `Computer`!
+* [Docker](https://docker.com/) (containerized desktop)
+* [Browserbase](https://www.browserbase.com/) (remote browser, requires account)
+* [Scrapybara](https://scrapybara.com) (remote browser or computer, requires account)
+* ...or implement your own `Computer`!
+
+
+Install BitWarden CLI
+
+```javascript
+npm install -g @bitwarden/cli
+```
+
+Full BitWarden instructions: <https://bitwarden.com/help/cli/>
 
 ## Overview
 
