@@ -71,8 +71,5 @@ def create_response(**kwargs):
 def check_blocklisted_url(url: str) -> None:
     """Raise ValueError if the given URL (including subdomains) is in the blocklist."""
     hostname = urlparse(url).hostname or ""
-    if any(
-        hostname == blocked or hostname.endswith(f".{blocked}")
-        for blocked in BLOCKED_DOMAINS
-    ):
+    if any(hostname == blocked or hostname.endswith(f".{blocked}") for blocked in BLOCKED_DOMAINS):
         raise ValueError(f"Blocked URL: {url}")
