@@ -4,7 +4,6 @@ import sys
 import re
 
 import pyotp
-
 import config
 
 

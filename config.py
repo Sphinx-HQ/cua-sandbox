@@ -4,7 +4,7 @@ env = environ.Env(
     # set casting, default value
     DEBUG=(bool, False)
 )
-env = env.read_env()
+env.read_env()
 
 
 BITWARDEN_CLIENT_ID = env.str("BITWARDEN_CLIENT_ID")
