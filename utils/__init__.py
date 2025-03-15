@@ -1,3 +1,5 @@
+"""Utils package for the OpenAI CUA Sample App."""
+
 import os
 import requests
 from dotenv import load_dotenv
@@ -7,6 +9,10 @@ from PIL import Image
 from io import BytesIO
 import io
 from urllib.parse import urlparse
+from .mfa_login import get_auth_data
+
+__all__ = ["get_auth_data"]
+
 
 load_dotenv(override=True)
 
@@ -71,8 +77,5 @@ def create_response(**kwargs):
 def check_blocklisted_url(url: str) -> None:
     """Raise ValueError if the given URL (including subdomains) is in the blocklist."""
     hostname = urlparse(url).hostname or ""
-    if any(
-        hostname == blocked or hostname.endswith(f".{blocked}")
-        for blocked in BLOCKED_DOMAINS
-    ):
+    if any(hostname == blocked or hostname.endswith(f".{blocked}") for blocked in BLOCKED_DOMAINS):
         raise ValueError(f"Blocked URL: {url}")
