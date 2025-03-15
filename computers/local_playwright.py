@@ -1,6 +1,8 @@
 from playwright.sync_api import Browser, Page
 from .base_playwright import BasePlaywrightComputer
-import os
+from utils import get_auth_data
+import config
+
 
 class LocalPlaywrightComputer(BasePlaywrightComputer):
     """Launches a local Chromium instance using Playwright."""
@@ -8,8 +10,10 @@ class LocalPlaywrightComputer(BasePlaywrightComputer):
     def __init__(self, headless: bool = False):
         super().__init__()
         self.headless = headless
-        self.hubspot_email = os.environ["HUBSPOT_EMAIL"]
-        self.hubspot_password = os.environ["HUBSPOT_PASSWORD"]
+        auth_data = get_auth_data(config.BITWARDEN_CLIENT_ID, config.BITWARDEN_CLIENT_SECRET, config.BITWARDEN_MASTER_PASSWORD)
+        self.hubspot_email = auth_data["username"]
+        self.hubspot_password = auth_data["password"]
+        self.totp_code = auth_data["totp_code"]
 
     def _login_to_hubspot(self, page: Page) -> None:
         """Handle HubSpot login process."""
@@ -27,6 +31,22 @@ class LocalPlaywrightComputer(BasePlaywrightComputer):
         page.wait_for_selector('input[type="password"]')
         page.fill('input[type="password"]', self.hubspot_password)
         page.click('button[type="submit"]')
+
+        # Click on secondary verification method
+        page.click('text="Use your secondary verification method"')
+
+        # Handle TOTP 2FA
+        page.wait_for_selector('input[type="text"]')  # Wait for TOTP input field
+        page.fill('input[type="text"]', self.totp_code)
+        page.click('button[type="submit"]')
+
+        # Check for and click "Remember me" if it appears
+        try:
+            remember_button = page.wait_for_selector('button:has-text("Remember me")', timeout=5000)
+            if remember_button:
+                remember_button.click()
+        except:
+            pass
 
         # Wait for login to complete
         page.wait_for_url("**/home/**", timeout=30000)
