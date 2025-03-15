@@ -9,14 +9,16 @@ class LocalPlaywrightComputer(BasePlaywrightComputer):
 
     def __init__(self, headless: bool = False):
         super().__init__()
+
         self.headless = headless
+
         auth_data = get_auth_data(config.BITWARDEN_CLIENT_ID, config.BITWARDEN_CLIENT_SECRET, config.BITWARDEN_MASTER_PASSWORD)
         self.hubspot_email = auth_data["username"]
         self.hubspot_password = auth_data["password"]
         self.totp_code = auth_data["totp_code"]
 
-    def _login_to_hubspot(self, page: Page) -> None:
-        """Handle HubSpot login process."""
+    def _login_to_hubspot(self, page: Page) -> Page:
+        """Handle HubSpot login process and return the logged-in page."""
         if not self.hubspot_email or not self.hubspot_password:
             raise ValueError("HubSpot credentials are required")
 
@@ -48,8 +50,9 @@ class LocalPlaywrightComputer(BasePlaywrightComputer):
         except:
             pass
 
-        # Wait for login to complete
+        # Wait for the dashboard to load and return the page
         page.wait_for_url("**/home/**", timeout=30000)
+        return page
 
     def _get_browser_and_page(self) -> tuple[Browser, Page]:
         width, height = self.dimensions
@@ -64,7 +67,7 @@ class LocalPlaywrightComputer(BasePlaywrightComputer):
         page.set_viewport_size({"width": width, "height": height})
         page.goto("https://app.hubspot.com/login")
 
-        # Add login step
-        self._login_to_hubspot(page)
+        # Login and get the logged-in page
+        page = self._login_to_hubspot(page)
 
         return browser, page
